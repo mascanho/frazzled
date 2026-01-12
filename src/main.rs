@@ -10,7 +10,7 @@ use tokio::sync::{Mutex, Semaphore};
 async fn main() {
     println!("Starting stress test...");
 
-    let url = "https://www.slimstock.com";
+    let url = "https://www.yourwebsite.com";
     let total_requests = 100_000;
     let concurrency = 500;
 
