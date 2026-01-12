@@ -8,8 +8,8 @@ use tokio::sync::{Mutex, Semaphore};
 #[tokio::main]
 async fn main() {
     let url = "https://www.scpclub.com";
-    let total_requests = 1;
-    let concurrency = 1;
+    let total_requests = 100_000;
+    let concurrency = 500;
 
     let client = Client::builder()
         .timeout(Duration::from_secs(5))
