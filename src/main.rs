@@ -2,12 +2,15 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use hdrhistogram::Histogram;
+use indicatif::ProgressBar;
 use reqwest::Client;
 use tokio::sync::{Mutex, Semaphore};
 
 #[tokio::main]
 async fn main() {
-    let url = "https://www.scpclub.com";
+    println!("Starting stress test...");
+
+    let url = "https://www.slimstock.com";
     let total_requests = 100_000;
     let concurrency = 500;
 
@@ -18,6 +21,15 @@ async fn main() {
 
     let semaphore = Arc::new(Semaphore::new(concurrency));
     let histogram = Arc::new(Mutex::new(Histogram::<u64>::new(3).unwrap()));
+
+    let progress_bar = ProgressBar::new(total_requests as u64);
+    progress_bar.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos:>7}/{len:7} ({eta}) {msg}")
+            .unwrap()
+            .progress_chars("#>-")
+    );
+    // progress_bar.set_message("");
 
     let mut handles = Vec::with_capacity(total_requests);
 
@@ -43,6 +55,7 @@ async fn main() {
             }
         });
 
+        progress_bar.inc(1);
         handles.push(handle);
     }
 
@@ -50,6 +63,7 @@ async fn main() {
         let _ = h.await;
     }
 
+    progress_bar.finish();
     let elapsed = start.elapsed();
     let histogram = histogram.lock().await;
 
